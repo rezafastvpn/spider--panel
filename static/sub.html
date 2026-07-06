@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Spider Sub | اشتراک</title>
+<style>
+:root{--bg:#0a0a0f;--bg2:#12121a;--bg3:#1a1a26;--txt:#e0e0e8;--txt2:#8888a0;--red:#FF1A3D;--neon:#FF1A3D;--green:#00e676;--blue:#4a90d9;--purple:#8b5cf6;--gold:#f59e0b;--r:12px;--glow:0 0 20px rgba(255,26,61,.15)}
+[data-theme="light"]{--bg:#f5f5f9;--bg2:#ffffff;--bg3:#e8e8f0;--txt:#1a1a2e;--txt2:#666680;--glow:0 0 20px rgba(255,26,61,.08)}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--txt);min-height:100vh;display:flex;align-items:center;justify-content:center;overflow-x:hidden}
+.bg-anim{position:fixed;inset:0;z-index:0;pointer-events:none}
+.bg-anim .orb{position:absolute;border-radius:50%;filter:blur(100px);animation:float 12s ease-in-out infinite}
+.bg-anim .orb1{width:400px;height:400px;background:var(--red);top:-100px;right:-100px;opacity:.08}
+.bg-anim .orb2{width:300px;height:300px;background:var(--blue);bottom:-80px;left:-80px;opacity:.06;animation-delay:-6s}
+@keyframes float{0%,100%{transform:translate(0,0)}50%{transform:translate(30px,-20px)}}
+
+.container{position:relative;z-index:1;width:100%;max-width:480px;padding:20px}
+.card{background:var(--bg2);border:1px solid var(--bg3);border-radius:16px;overflow:hidden;box-shadow:var(--glow)}
+
+.hdr{background:linear-gradient(135deg,var(--red),#7B1FA2);padding:32px 24px;text-align:center;position:relative;overflow:hidden}
+.hdr::before{content:'';position:absolute;inset:0;background:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")}
+.user-info{position:relative;z-index:1}
+.user-avatar{width:64px;height:64px;border-radius:50%;background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;margin:0 auto 12px;font-size:28px;font-weight:800;color:#fff;border:3px solid rgba(255,255,255,.3)}
+.user-name{font-size:22px;font-weight:800;color:#fff;text-shadow:0 2px 8px rgba(0,0,0,.3)}
+.user-tag{font-size:12px;color:rgba(255,255,255,.7);margin-top:4px}
+
+.body{padding:20px 24px}
+
+.stat-row{display:flex;gap:12px;margin-bottom:20px}
+.stat-box{flex:1;background:var(--bg3);border-radius:var(--r);padding:14px 12px;text-align:center}
+.stat-val{font-size:18px;font-weight:700;color:var(--neon)}
+.stat-lbl{font-size:11px;color:var(--txt2);margin-top:4px}
+.stat-box.warn .stat-val{color:var(--gold)}
+.stat-box.good .stat-val{color:var(--green)}
+.stat-box.danger .stat-val{color:var(--red)}
+
+.traffic-bar{margin-bottom:20px}
+.traffic-bar-h{display:flex;justify-content:space-between;margin-bottom:6px;font-size:12px;color:var(--txt2)}
+.traffic-bar-bg{height:8px;background:var(--bg3);border-radius:4px;overflow:hidden}
+.traffic-bar-fill{height:100%;background:linear-gradient(90deg,var(--red),var(--purple));border-radius:4px;transition:width .5s}
+
+.cfg-box{background:var(--bg3);border-radius:var(--r);padding:16px;margin-bottom:16px;position:relative}
+.cfg-label{font-size:11px;color:var(--txt2);margin-bottom:8px;text-transform:uppercase;letter-spacing:1px}
+.cfg-link{font-family:'Courier New',monospace;font-size:12px;direction:ltr;text-align:left;word-break:break-all;background:rgba(0,0,0,.2);padding:12px;border-radius:8px;max-height:100px;overflow-y:auto;color:var(--txt);line-height:1.6}
+
+.btn-row{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:10px 16px;border:none;border-radius:var(--r);font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;font-family:inherit;text-decoration:none}
+.btn-prim{background:linear-gradient(135deg,var(--red),#c2185b);color:#fff;flex:1}
+.btn-prim:hover{filter:brightness(1.15);transform:translateY(-1px)}
+.btn-ghost{background:var(--bg3);color:var(--txt)}
+.btn-ghost:hover{background:var(--bg2)}
+.btn-green{background:var(--green);color:#000}
+.btn-copy{background:var(--bg3);color:var(--txt);font-size:12px;padding:8px 12px}
+
+.qr-section{display:flex;justify-content:center;margin-bottom:16px}
+.qr-img{border-radius:var(--r);border:2px solid var(--bg3);max-width:180px}
+
+.app-section{margin-top:20px}
+.app-section-title{font-size:13px;font-weight:700;color:var(--txt2);margin-bottom:12px;text-align:center}
+.app-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.app-card{display:flex;flex-direction:column;align-items:center;gap:6px;padding:14px 8px;background:var(--bg3);border-radius:var(--r);cursor:pointer;transition:all .2s;border:1px solid transparent;text-decoration:none;color:var(--txt)}
+.app-card:hover{border-color:var(--neon);box-shadow:var(--glow)}
+.app-ic{font-size:28px}
+.app-name{font-size:12px;font-weight:600}
+.app-os{font-size:10px;color:var(--txt2)}
+
+.ping-section{margin-top:20px;text-align:center}
+.ping-btn{display:inline-flex;align-items:center;gap:6px;padding:12px 24px;background:linear-gradient(135deg,var(--blue),var(--purple));color:#fff;border:none;border-radius:var(--r);font-size:14px;font-weight:600;cursor:pointer;transition:all .2s;font-family:inherit}
+.ping-btn:hover{filter:brightness(1.15)}
+.ping-btn:disabled{opacity:.6;cursor:not-allowed}
+.ping-res{margin-top:12px;font-size:18px;font-weight:700}
+.ping-res.fast{color:var(--green)}
+.ping-res.mid{color:var(--gold)}
+.ping-res.slow{color:var(--red)}
+
+.btn-sub{display:inline-flex;align-items:center;gap:6px;padding:10px 18px;background:var(--bg3);color:var(--txt);border:none;border-radius:var(--r);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;text-decoration:none}
+.btn-sub:hover{background:var(--green);color:#000}
+
+.foot{text-align:center;padding:16px;font-size:11px;color:var(--txt2)}
+.foot a{color:var(--neon);text-decoration:none}
+
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--bg2);border:1px solid var(--bg3);color:var(--txt);padding:10px 20px;border-radius:20px;font-size:13px;z-index:999;opacity:0;transition:opacity .3s;pointer-events:none}
+.toast.show{opacity:1}
+
+.loading{text-align:center;padding:40px;color:var(--txt2)}
+.spinner{width:32px;height:32px;border:3px solid var(--bg3);border-top-color:var(--neon);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 12px}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+.error-msg{text-align:center;padding:40px;color:var(--red)}
+
+@media(max-width:400px){
+  .app-grid{grid-template-columns:1fr 1fr}
+  .stat-row{gap:8px}
+}
+</style>
+</head>
+<body>
+
+<div class="bg-anim"><div class="orb orb1"></div><div class="orb orb2"></div></div>
+
+<div class="container" id="app">
+  <div class="loading"><div class="spinner"></div><p>در حال بارگذاری...</p></div>
+</div>
+
+<div class="toast" id="toast"></div>
+<div class="foot">Powered by <a href="/spider">Spider Panel</a></div>
+
+<script>
+var username = window.location.pathname.split('/').pop();
+document.title = 'Spider Sub | ' + username;
+
+function toast(m){var t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(function(){t.classList.remove('show')},2000)}
+
+function fm(b){if(!b||b<1)return'0 B';if(b<1024)return b+' B';if(b<1048576)return(b/1024).toFixed(1)+' KB';if(b<1073741824)return(b/1048576).toFixed(2)+' MB';return(b/1073741824).toFixed(2)+' GB'}
+
+async function loadSub(){
+  try{
+    var r=await fetch('/api/sub/'+username);
+    if(!r.ok) throw new Error('User not found');
+    var d=await r.json();
+    renderSub(d);
+  }catch(e){
+    var errMsg=e.message||'Unknown error';
+    if(errMsg==='User not found')errMsg='\u06A9\u0627\u0631\u0628\u0631 \u0022'+username+'\u0022 \u067E\u06CC\u062F\u0627 \u0646\u0634\u062F. \u0627\u0628\u062A\u062F\u0627 \u062F\u0631 \u067E\u0646\u0644 \u0627\u06CC\u062C\u0627\u062F \u06A9\u0646\u06CC\u062F.';
+    document.getElementById('app').innerHTML='\u003Cdiv class="card"\u003E\u003Cdiv class="hdr"\u003E\u003Cdiv class="user-info"\u003E\u003Cdiv class="user-avatar"\u003E'+username.charAt(0).toUpperCase()+'\u003C/div\u003E\u003Cdiv class="user-name"\u003E'+username+'\u003C/div\u003E\u003Cdiv class="user-tag"\u003E'+errMsg+'\u003C/div\u003E\u003C/div\u003E\u003C/div\u003E\u003Cdiv class="body" style="text-align:center;color:var(--txt2)"\u003E\u003Cp\u003E\u06A9\u0627\u0631\u0628\u0631 \u0628\u0627 \u0627\u06CC\u0646 \u0646\u0627\u0645 \u062F\u0631 \u0633\u06CC\u0633\u062A\u0645 \u0648\u062C\u0648\u062F \u0646\u062F\u0627\u0631\u062F.\u003C/p\u003E\u003Cp style="margin-top:8px;font-size:12px"\u003E\u0627\u0628\u062A\u062F\u0627 \u062F\u0631 \u067E\u0646\u0644 Spider \u06A9\u0627\u0631\u0628\u0631 \u0631\u0627 \u0628\u0633\u0627\u0632\u06CC\u062F.\u003C/p\u003E\u003C/div\u003E\u003C/div\u003E';
+  }
+}
+
+function renderSub(d){
+  var used=d.traffic_used_bytes||0,limit=d.traffic_limit_bytes||0,pct=limit>0?Math.min(100,(used/limit*100)).toFixed(1):0;
+  var days=d.expire_days;
+  var daysCls=days===null?'good':days>7?'good':days>2?'warn':'danger';
+  var daysTxt=days===null?'∞':days>0?days+' روز':days===0?'امروز':'منقضی';
+  var name=d.username||username;
+  var initial=name.charAt(0).toUpperCase();
+  var proto=(d.protocol||'vless').toUpperCase();
+  var cfg=d.vless_link||d.config||'';
+  var pingUrl=window.location.origin+'/sub/'+username+'/ping';
+
+  var h='';
+  h+='<div class="card">';
+
+  // Header
+  h+='<div class="hdr"><div class="user-info">';
+  h+='<div class="user-avatar">'+initial+'</div>';
+  h+='<div class="user-name">'+name+'</div>';
+  h+='<div class="user-tag">'+proto+' Subscription</div>';
+  h+='</div></div>';
+
+  // Body
+  h+='<div class="body">';
+
+  // Stats
+  h+='<div class="stat-row">';
+  h+='<div class="stat-box"><div class="stat-val">'+fm(used)+'</div><div class="stat-lbl">مصرف</div></div>';
+  h+='<div class="stat-box"><div class="stat-val">'+(limit>0?fm(limit):'∞')+'</div><div class="stat-lbl">حجم کل</div></div>';
+  h+='<div class="stat-box '+daysCls+'"><div class="stat-val">'+daysTxt+'</div><div class="stat-lbl">روز باقی‌مانده</div></div>';
+  h+='</div>';
+
+  // Traffic bar
+  h+='<div class="traffic-bar"><div class="traffic-bar-h"><span>مصرف '+pct+'%</span><span>'+fm(used)+' / '+(limit>0?fm(limit):'∞')+'</span></div><div class="traffic-bar-bg"><div class="traffic-bar-fill" style="width:'+pct+'%"></div></div></div>';
+
+  // Config
+  if(cfg){
+    h+='<div class="cfg-box"><div class="cfg-label">⚡ لینک کانفیگ</div><div class="cfg-link" id="cfg-text">'+cfg+'</div><button class="btn-copy" onclick="copyCfg()" style="margin-top:8px;width:100%">📋 کپی لینک کانفیگ</button></div>';
+  }
+
+  // Buttons
+  h+='<div class="btn-row">';
+  if(cfg){
+    h+='<button class="btn btn-prim" onclick="copyCfg()">📋 کپی کانفیگ</button>';
+    h+='<button class="btn btn-prim" onclick="addToApp()" style="background:linear-gradient(135deg,#4a90d9,#8b5cf6)">📱 افزودن به برنامه</button>';
+  }
+  h+='<button class="btn btn-ghost" onclick="location.href=\'v2rayng://install-sub?url='+encodeURIComponent(window.location.href)+'\'">🔗 import v2rayNG</button>';
+  h+='</div>';
+
+  // QR
+  if(cfg){
+    var qrUrl='https://api.qrserver.com/v1/create-qr-code/?size=200x200&data='+encodeURIComponent(cfg);
+    h+='<div class="qr-section"><img class="qr-img" src="'+qrUrl+'" alt="QR Code" onerror="this.style.display=\'none\'"></div>';
+  }
+
+  // Ping
+  h+='<div class="ping-section">';
+  h+='<button class="ping-btn" id="ping-btn" onclick="doPing()">📡 تست پینگ واقعی</button>';
+  h+='<div class="ping-res" id="ping-res"></div>';
+  h+='</div>';
+
+  // App downloads
+  h+='<div class="app-section"><div class="app-section-title">📲 دانلود برنامه</div><div class="app-grid">';
+  h+='<a class="app-card" href="https://github.com/2dust/v2rayNG/releases" target="_blank"><div class="app-ic">🤖</div><div class="app-name">v2rayNG</div><div class="app-os">Android</div></a>';
+  h+='<a class="app-card" href="https://apps.apple.com/app/streisand/id6450534064" target="_blank"><div class="app-ic">🍎</div><div class="app-name">Streisand</div><div class="app-os">iOS</div></a>';
+  h+='<a class="app-card" href="https://github.com/2dust/v2rayN/releases" target="_blank"><div class="app-ic">🪟</div><div class="app-name">v2rayN</div><div class="app-os">Windows</div></a>';
+  h+='</div></div>';
+
+  // Direct subscribe
+  h+='<div style="text-align:center;margin-top:16px">';
+  h+='<a class="btn-sub" href="v2rayng://install-sub?url='+encodeURIComponent(window.location.href)+'">📥 اضافه شدن مستقیم به v2rayNG</a>';
+  h+='</div>';
+
+  h+='</div></div>';
+
+  document.getElementById('app').innerHTML=h;
+  window._cfg=cfg;
+  window._pingUrl=pingUrl;
+}
+
+function copyCfg(){
+  if(!window._cfg) return;
+  navigator.clipboard.writeText(window._cfg).then(function(){toast('✅ کانفیگ کپی شد')}).catch(function(){toast('خطا در کپی')});
+}
+
+function addToApp(){
+  if(!window._cfg) return;
+  var url='v2rayng://install-config?url='+encodeURIComponent('data:text/plain;base64,'+btoa(window._cfg));
+  window.open(url,'_blank');
+  toast('📱 باز کردن در برنامه...');
+}
+
+async function doPing(){
+  var btn=document.getElementById('ping-btn');
+  var res=document.getElementById('ping-res');
+  btn.disabled=true;btn.textContent='⏳ در حال تست...';
+  res.textContent='';
+  var t0=Date.now();
+  try{
+    var r=await fetch(window._pingUrl,{method:'GET'});
+    var ms=Date.now()-t0;
+    var cls=ms<100?'fast':ms<300?'mid':'slow';
+    var emoji=ms<100?'🟢':ms<300?'🟡':'🔴';
+    res.textContent=emoji+' پینگ: '+ms+' ms';
+    res.className='ping-res '+cls;
+  }catch(e){
+    var ms=Date.now()-t0;
+    res.textContent='⚠️ Timeout پس از '+ms+' ms';
+    res.className='ping-res slow';
+  }
+  btn.disabled=false;btn.textContent='📡 تست پینگ واقعی';
+}
+
+// Load
+loadSub();
+</script>
+</body>
+</html>
