@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="fa" dir="rtl" data-theme="dark">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
@@ -267,11 +267,7 @@ tr:hover td{background:rgba(255,255,255,.02)}
           <button class="btn btn-p" onclick="saveRealitySettings()" style="width:100%;margin-top:12px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> ذخیره تنظیمات Reality</button>
         </div>
 
-        <!-- Subscriptions -->
-        <div class="panel"><div class="panel-h"><span class="glow">📦 اشتراک‌ها (Subs)</span><button class="btn btn-p btn-sm" onclick="openCreateSub()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> اشتراک جدید</button></div>
-          <div id="subs-c"><div class="empty">در حال بارگذاری...</div></div>
-        </div>
-      </div>
+
 
       <!-- ═══ SETTINGS ═══ -->
       <div id="tab-settings" class="tab-content hidden">
@@ -332,21 +328,13 @@ tr:hover td{background:rgba(255,255,255,.02)}
   <button class="btn btn-g" onclick="closeModal('mod-cfg')" style="width:100%;margin-top:8px">بستن</button>
 </div></div>
 
-<div class="modal" id="mod-sub"><div class="modal-c">
-  <div class="modal-t"><span class="glow">ایجاد اشتراک جدید</span></div>
-  <form onsubmit="submitCreateSub(event)">
-    <div class="f-g"><label>نام اشتراک</label><input type="text" id="cs-name" required></div>
-    <div class="f-g"><label>توضیحات</label><input type="text" id="cs-desc"></div>
-    <div class="f-g"><label>رمز (اختیاری - برای اشتراک خصوصی)</label><input type="password" id="cs-pw"></div>
-    <div class="modal-btns"><button type="button" class="btn btn-g" onclick="closeModal('mod-sub')">انصراف</button><button type="submit" class="btn btn-p" id="cs-submit">ایجاد اشتراک</button></div>
-  </form>
-</div></div>
+
 
 <div class="toast" id="toast"></div>
 
 <script>
 // ═══════ STATE ═══════
-var ALL_U=[],ALL_S=[],pgU=1,PS=10,curCfg='',siIPs=[],cfgTab='vless';
+var ALL_U=[],pgU=1,PS=10,curCfg='',siIPs=[],cfgTab='vless';
 function $id(id){return document.getElementById(id)}
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
 function fm(b){if(!b||b<1)return'0 B';var u=['B','KB','MB','GB'];var i=0;while(b>=1024&&i<u.length-1){b/=1024;i++}return b.toFixed(i===0?0:2)+' '+u[i]}
@@ -381,10 +369,10 @@ async function doLogout(){await fetch('/api/logout',{method:'POST'});$id('app-wr
 async function showApp(){$id('login-wrap').style.display='none';$id('app-wrap').classList.add('active');
   var h=new Date().getHours(),g='';if(h<6)g='شب بخیر';else if(h<12)g='صبح بخیر';else if(h<18)g='ظهر بخیر';else g='عصر بخیر';
   $id('grt').innerHTML='<strong>'+g+'</strong> 👋 به Spider Panel خوش آمدید';loadAll();setInterval(loadStats,30000)}
-async function loadAll(){loadStats();loadUsers();loadSubs()}
+async function loadAll(){loadStats();loadUsers()}
 
 // ═══════ NAV ═══════
-function switchTab(tab,el){document.querySelectorAll('.nav-item').forEach(function(n){n.classList.remove('active')});if(el)el.classList.add('active');document.querySelectorAll('.tab-content').forEach(function(t){t.classList.add('hidden')});var t=$id('tab-'+tab);if(t){t.classList.remove('hidden');if(tab==='tools'){loadConnectionModes();loadRealitySettings();loadSubs()}}}
+function switchTab(tab,el){document.querySelectorAll('.nav-item').forEach(function(n){n.classList.remove('active')});if(el)el.classList.add('active');document.querySelectorAll('.tab-content').forEach(function(t){t.classList.add('hidden')});var t=$id('tab-'+tab);if(t){t.classList.remove('hidden');if(tab==='tools'){loadConnectionModes();loadRealitySettings()}}}
 
 // ═══════ STATS ═══════
 async function loadStats(){try{var d=await api('/stats');$id('s1').textContent=d.active_users||0;$id('s1b').textContent='کل: '+(d.total_users||0);$id('s2').textContent=d.total_users||0;$id('s2b').textContent='فعال: '+(d.active_users||0);$id('s3').textContent=(d.traffic_usage_gb||0).toFixed(2)+' GB';$id('s3b').textContent='اتصالات: '+(d.active_connections||0);$id('s4').textContent=d.uptime||'--';$id('s4b').textContent=d.server_status||'healthy'}catch(e){}}
@@ -425,17 +413,6 @@ async function deleteU(uid){if(!confirm('حذف کاربر؟'))return;try{await 
 async function viewCfg(uid){try{var d=await api('/api/users/'+uid+'/config');curCfg=d.config||'';$id('cfg-code').textContent=curCfg;openModal('mod-cfg')}catch(e){}}
 function showQR(){if(curCfg){$id('cfg-qr').src='https://api.qrserver.com/v1/create-qr-code/?size=200x200&data='+encodeURIComponent(curCfg);$id('cfg-qr-wrap').style.display='block'}else toast('اول کانفیگ رو ببین','err')}
 function copyCfg(){if(curCfg)navigator.clipboard.writeText(curCfg).then(function(){toast('کپی شد','ok')}).catch(function(){toast('خطا','err')})}
-
-// ═══════ SUBS ═══════
-async function loadSubs(){try{var d=await api('/api/subs');ALL_S=d.subs||[];renderSubs()}catch(e){$id('subs-c').innerHTML='<div class="empty">خطا در بارگذاری</div>'}}
-function renderSubs(){var el=$id('subs-c');if(!ALL_S.length){el.innerHTML='<div class="empty">هیچ اشتراکی نیست</div>';return}
-  el.innerHTML=ALL_S.map(function(s){var url=window.location.origin+'/sub-sync/sub/'+(s.name||s.id);return'<div class="sub-card"><div class="sub-card-h"><span class="sub-card-name">'+(s.name||'اشتراک')+'</span><span class="badge badge-g">'+(s.links_count||0)+' کانفیگ</span></div><input class="sub-link" readonly value="'+url+'" onclick="this.select()"><div class="sub-acts"><button class="btn btn-sm btn-g" onclick="copyText(\''+url+'\')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg> کپی</button><button class="btn btn-sm btn-b" onclick="window.open(\'/sub-sync/sub/'+(s.name||s.id)+'\',\'_blank\')">🔗 باز کردن</button><button class="btn btn-sm btn-r" onclick="delSub(\''+s.id+'\')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg></button></div></div>'}).join('')}
-function openCreateSub(){$id('mod-sub').classList.add('show')}
-async function submitCreateSub(e){e.preventDefault();var btn=$id('cs-submit');btn.disabled=true;btn.textContent='⏳';var body={name:$id('cs-name').value,description:$id('cs-desc').value};var pw=$id('cs-pw').value.trim();if(pw)body.password=pw;
-  try{await api('/api/subs',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});toast('اشتراک ایجاد شد','ok');closeModal('mod-sub');loadSubs()}catch(e){}btn.disabled=false;btn.textContent='ایجاد'}
-async function delSub(id){if(!confirm('حذف؟'))return;try{await api('/api/subs/'+id,{method:'DELETE'});toast('حذف شد','ok');loadSubs()}catch(e){}}
-function copySubLink(uname){var url=window.location.origin+'/sub/'+uname;navigator.clipboard.writeText(url).then(function(){toast('\u0644\u06CC\u0646\u06A9 \u0633\u0627\u0628 \u06A9\u067E\u06CC \u0634\u062F','ok')}).catch(function(){})}
-function copyText(t){navigator.clipboard.writeText(t).then(function(){toast('کپی شد','ok')})}
 
 // ═══════ SPIDER IP ═══════
 var networkDB={all:[[172,64,0,0,13],[104,16,0,0,12],[162,159,0,0,16],[108,162,192,0,18]],mci:[[104,16,24,0,14],[172,67,10,0,15],[162,159,36,0,16]],mtn:[[108,162,192,0,18],[104,18,45,0,14],[172,64,50,0,14]],ict:[[104,16,0,0,12],[162,159,0,0,16]]};
@@ -483,7 +460,6 @@ async function saveDefaultConnection(){var v=$id('ts-defconn').value;
 async function generateRealityKeys(){try{var d=await api('/api/tools/generate-reality-keys',{method:'POST'});$id('rs-pbk').value=d.public_key;toast('کلید Public تولید شد',d.note?'warn':'ok');if(d.note)toast(d.note,'warn')}catch(e){toast('خطا در تولید کلید','err')}}
 
 // ═══════ SETTINGS ═══════
-async function generateKeys(){try{var d=await api('/api/tools/generate-reality-keys',{method:'POST'});$id('rs-pbk').value=d.public_key;var el=$id('key-result');el.style.display='block';el.innerHTML='<b>Private:</b> '+d.private_key+'<br><b>Public:</b> '+d.public_key;toast('Key Pair تولید شد (Public در فیلد PBK قرار گرفت)','ok')}catch(e){toast('خطا: cryptography نصب نیست','err')}}
 async function changePassword(){var o=$id('set-old').value,n=$id('set-new').value;if(!o||!n){toast('همه فیلدها پر شود','err');return}if(n.length<4){toast('رمز حداقل ۴ کاراکتر','err');return}
   try{await api('/api/change-password',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({current_password:o,new_password:n})});toast('رمز تغییر کرد','ok');$id('set-old').value='';$id('set-new').value=''}catch(e){}}
 
