@@ -360,7 +360,7 @@ def generate_short_id() -> str:
 
 def generate_user_config(user_id: str, user: dict) -> str:
     """Generate a connection config string for a user based on their protocol."""
-    host = get_host()
+    host = SETTINGS.get("domain") or get_host()
     protocol = user.get("protocol", "vless")
     config_uuid = user.get("config_uuid", "")
     username = user.get("username", user_id)
@@ -373,7 +373,8 @@ def generate_user_config(user_id: str, user: dict) -> str:
     if raw_path:
         path_enc = quote(raw_path, safe='')
     else:
-        path_enc = quote(f"/{config_uuid}", safe='')
+        # Default path must match WebSocket route: /ws/{uuid}
+        path_enc = quote(f"/ws/{config_uuid}", safe='')
 
     # ── Reality Protocol ──
     if protocol == "reality":
@@ -491,7 +492,7 @@ async def subscription_single(uuid: str):
         link = LINKS.get(uuid)
     if not link or not is_link_allowed(link):
         raise HTTPException(status_code=404, detail="not found")
-    host = get_host()
+    host = SETTINGS.get("domain") or get_host()
     proto = link.get("protocol", DEFAULT_PROTOCOL)
     vless = generate_vless_link(uuid, host, remark=f"Spider-{link['label']}", protocol=proto)
     content = base64.b64encode(vless.encode()).decode()
@@ -501,7 +502,7 @@ async def subscription_single(uuid: str):
 @app.get("/sub-all")
 async def subscription_all(_=Depends(require_auth)):
     import base64
-    host = get_host()
+    host = SETTINGS.get("domain") or get_host()
     async with LINKS_LOCK:
         lines = [
             generate_vless_link(uid, host, remark=f"Spider-{d['label']}", protocol=d.get("protocol", DEFAULT_PROTOCOL))
@@ -534,7 +535,7 @@ async def create_sub(request: Request, _=Depends(require_auth)):
         }
     asyncio.create_task(save_state())
     log_activity("sub", f"گروه «{name}» ساخته شد", "ok")
-    host = get_host()
+    host = SETTINGS.get("domain") or get_host()
     return {
         "sub_id": sub_id,
         **SUBS[sub_id],
@@ -544,7 +545,7 @@ async def create_sub(request: Request, _=Depends(require_auth)):
 
 @app.get("/api/subs")
 async def list_subs(_=Depends(require_auth)):
-    host = get_host()
+    host = SETTINGS.get("domain") or get_host()
     async with SUBS_LOCK:
         snap_subs = dict(SUBS)
     async with LINKS_LOCK:
@@ -639,7 +640,7 @@ async def sub_group_subscription(uuid_key: str, request: Request):
         if hash_password(pw) != sub["password_hash"]:
             raise HTTPException(status_code=403, detail="wrong password")
 
-    host = get_host()
+    host = SETTINGS.get("domain") or get_host()
     link_ids = sub.get("link_ids", [])
     async with LINKS_LOCK:
         lines = []
@@ -871,7 +872,7 @@ async def create_link(request: Request, _=Depends(require_auth)):
 
     asyncio.create_task(save_state())
     log_activity("link", f"کانفیگ «{label}» ساخته شد", "ok")
-    host = get_host()
+    host = SETTINGS.get("domain") or get_host()
     return {
         "uuid": uid,
         **LINKS[uid],
@@ -882,7 +883,7 @@ async def create_link(request: Request, _=Depends(require_auth)):
 
 @app.get("/api/links")
 async def list_links(_=Depends(require_auth)):
-    host = get_host()
+    host = SETTINGS.get("domain") or get_host()
     async with LINKS_LOCK:
         snap = dict(LINKS)
     result = []
@@ -1014,7 +1015,7 @@ async def http_proxy(target_url: str, request: Request):
 @app.get("/api/users")
 async def list_users(_=Depends(require_auth)):
     """List all users with traffic stats and status."""
-    host = get_host()
+    host = SETTINGS.get("domain") or get_host()
     async with USERS_LOCK:
         snap = dict(USERS)
 
@@ -1105,7 +1106,7 @@ async def create_user(request: Request, _=Depends(require_auth)):
 
     asyncio.create_task(save_state())
     log_activity("user", f"کاربر «{username}» با پروتکل {protocol} ساخته شد", "ok")
-    host = get_host()
+    host = SETTINGS.get("domain") or get_host()
     return {
         "user_id": user_id,
         **USERS[user_id],
@@ -1217,7 +1218,7 @@ async def get_single_user(user_id: str, _=Depends(require_auth)):
         user["user_id"] = user_id
         user["password_hash"] = None  # Never expose hash
     auto_check_user_expiry(user)
-    host = get_host()
+    host = SETTINGS.get("domain") or get_host()
     return {
         **user,
         "config": generate_user_config(user_id, user),
@@ -1294,7 +1295,7 @@ async def get_user_config(user_id: str, _=Depends(require_auth)):
         config = generate_user_config(user_id, u)
         username = u.get("username")
         protocol = u.get("protocol")
-    host = get_host()
+    host = SETTINGS.get("domain") or get_host()
     return {
         "user_id": user_id,
         "username": username,
@@ -1331,7 +1332,7 @@ async def get_user_qr(user_id: str, _=Depends(require_auth)):
 @app.get("/api/users/{user_id}/subscription")
 async def get_user_subscription(user_id: str, _=Depends(require_auth)):
     """Return the subscription URL for a user."""
-    host = get_host()
+    host = SETTINGS.get("domain") or get_host()
     async with USERS_LOCK:
         u = USERS.get(user_id)
         if not u:
@@ -1378,7 +1379,7 @@ async def public_sub_data(uuid_key: str, request: Request):
         if hash_password(pw) != sub["password_hash"]:
             return JSONResponse({"locked": True, "name": sub["name"]})
 
-    host = get_host()
+    host = SETTINGS.get("domain") or get_host()
     link_ids = sub.get("link_ids", [])
     async with LINKS_LOCK:
         snap = dict(LINKS)
@@ -1542,35 +1543,75 @@ async def user_sub_ping(username: str):
 # TOOLS - Reality Settings
 # ══════════════════════════════════════════════════════════════════════════════
 
+
+@app.post("/api/tools/generate-reality-keys")
+async def generate_reality_keys(_=Depends(require_auth)):
+    """Generate a Reality key pair (x25519)."""
+    try:
+        from cryptography.hazmat.primitives.asymmetric.x25519 import X25519PrivateKey
+        priv = X25519PrivateKey.generate()
+        priv_bytes = priv.private_bytes_raw()
+        pub_bytes = priv.public_key().public_bytes_raw()
+        import base64 as b64
+        return {"private_key": b64.b64encode(priv_bytes).decode(), "public_key": b64.b64encode(pub_bytes).decode()}
+    except ImportError:
+        # Fallback: return placeholder (user needs cryptography package)
+        import secrets, base64 as b64
+        return {"private_key": b64.b64encode(secrets.token_bytes(32)).decode(), 
+                "public_key": b64.b64encode(secrets.token_bytes(32)).decode(),
+                "note": "Install cryptography for real keys: pip install cryptography"}
+
 @app.get("/api/tools/reality-settings")
 async def get_reality_settings(_=Depends(require_auth)):
     """Get Reality settings from global SETTINGS."""
-    return SETTINGS.get("reality", {
-        "port": 1234,
-        "dest": "google.com:443",
-        "sni": get_host(),
-        "public_key": "",
-        "short_id": "6ba85179e30d4fc2",
-        "spiderx": "/",
-        "external_domain": get_host(),
-        "external_port": 443,
-    })
+    async with SETTINGS_LOCK:
+        reality = SETTINGS.get("reality", {})
+    host = get_host()
+    return {
+        "port": reality.get("port", 1234),
+        "dest": reality.get("dest", "google.com:443"),
+        "sni": reality.get("sni", host),
+        "public_key": reality.get("public_key", ""),
+        "short_id": reality.get("short_id", "6ba85179e30d4fc2"),
+        "spiderx": reality.get("spiderx", "/"),
+        "external_domain": reality.get("external_domain", host),
+        "external_port": reality.get("external_port", 443),
+        "domain": reality.get("domain", host),
+        "domain_history": reality.get("domain_history", []),
+    }
 
 @app.post("/api/tools/reality-settings")
 async def set_reality_settings(request: Request, _=Depends(require_auth)):
     """Save Reality settings globally."""
     body = await request.json()
-    reality = {
-        "port": int(body.get("port", 1234)),
-        "dest": str(body.get("dest", "google.com:443")),
-        "sni": str(body.get("sni", get_host())),
-        "public_key": str(body.get("public_key", "")),
-        "short_id": str(body.get("short_id", "6ba85179e30d4fc2")),
-        "spiderx": str(body.get("spiderx", "/")),
-        "external_domain": str(body.get("external_domain", get_host())),
-        "external_port": int(body.get("external_port", 443)),
-    }
     async with SETTINGS_LOCK:
+        reality = SETTINGS.get("reality", {})
+        if "port" in body:
+            reality["port"] = int(body.get("port", 1234))
+        if "dest" in body:
+            reality["dest"] = str(body.get("dest", "google.com:443"))
+        if "sni" in body:
+            reality["sni"] = str(body.get("sni", get_host()))
+        if "public_key" in body:
+            reality["public_key"] = str(body.get("public_key", ""))
+        if "short_id" in body:
+            reality["short_id"] = str(body.get("short_id", "6ba85179e30d4fc2"))
+        if "spiderx" in body:
+            reality["spiderx"] = str(body.get("spiderx", "/"))
+        if "external_domain" in body:
+            reality["external_domain"] = str(body.get("external_domain", get_host()))
+        if "external_port" in body:
+            reality["external_port"] = int(body.get("external_port", 443))
+        if "domain" in body:
+            domain_val = str(body.get("domain", "")).strip()
+            if domain_val:
+                reality["domain"] = domain_val
+                # manage domain history (keep last 20, unique)
+                history = reality.get("domain_history", [])
+                if domain_val in history:
+                    history.remove(domain_val)
+                history.insert(0, domain_val)
+                reality["domain_history"] = history[:20]
         SETTINGS["reality"] = reality
     asyncio.create_task(save_state())
     log_activity("settings", "تنظیمات Reality ذخیره شد", "ok")
@@ -1579,12 +1620,19 @@ async def set_reality_settings(request: Request, _=Depends(require_auth)):
 @app.get("/api/tools/settings")
 async def get_global_settings(_=Depends(require_auth)):
     """Get global panel settings."""
+    host = get_host()
+    async with SETTINGS_LOCK:
+        reality = SETTINGS.get("reality", {})
     return {
-        "domain": SETTINGS.get("domain", get_host()),
+        "domain": SETTINGS.get("domain", host),
         "default_path": SETTINGS.get("default_path", "/"),
         "default_transport": SETTINGS.get("default_transport", "ws"),
         "enabled_protocols": SETTINGS.get("enabled_protocols", ["vless", "vmess", "trojan", "reality"]),
-        "reality": SETTINGS.get("reality", {}),
+        "reality": reality,
+        "domain_history": reality.get("domain_history", []),
+        "xhttp_mode": SETTINGS.get("xhttp_mode", True),
+        "websocket_mode": SETTINGS.get("websocket_mode", True),
+        "default_connection_mode": SETTINGS.get("default_connection_mode", "ws"),
     }
 
 @app.post("/api/tools/settings")
@@ -1593,13 +1641,33 @@ async def set_global_settings(request: Request, _=Depends(require_auth)):
     body = await request.json()
     async with SETTINGS_LOCK:
         if "domain" in body:
-            SETTINGS["domain"] = str(body["domain"]).strip()
+            domain_val = str(body["domain"]).strip()
+            if domain_val:
+                SETTINGS["domain"] = domain_val
+                # update domain history in reality too
+                reality = SETTINGS.get("reality", {})
+                history = reality.get("domain_history", [])
+                if domain_val in history:
+                    history.remove(domain_val)
+                history.insert(0, domain_val)
+                reality["domain_history"] = history[:20]
+                SETTINGS["reality"] = reality
         if "default_path" in body:
             SETTINGS["default_path"] = str(body["default_path"]).strip()
         if "default_transport" in body:
-            SETTINGS["default_transport"] = str(body["default_transport"]).strip()
+            val = str(body["default_transport"]).strip()
+            if val in ("ws", "xhttp", "tcp"):
+                SETTINGS["default_transport"] = val
         if "enabled_protocols" in body:
             SETTINGS["enabled_protocols"] = body["enabled_protocols"]
+        if "xhttp_mode" in body:
+            SETTINGS["xhttp_mode"] = bool(body["xhttp_mode"])
+        if "websocket_mode" in body:
+            SETTINGS["websocket_mode"] = bool(body["websocket_mode"])
+        if "default_connection_mode" in body:
+            val = str(body["default_connection_mode"]).strip()
+            if val in ("ws", "xhttp", "tcp"):
+                SETTINGS["default_connection_mode"] = val
     asyncio.create_task(save_state())
     log_activity("settings", "تنظیمات کلی ذخیره شد", "ok")
     return {"ok": True}
@@ -1616,7 +1684,7 @@ async def subsync_get_data():
         snap = dict(SUBS)
     async with LINKS_LOCK:
         snap_links = dict(LINKS)
-    host = get_host()
+    host = SETTINGS.get("domain") or get_host()
     result = []
     for sid, s in snap.items():
         link_ids = s.get("link_ids", [])
@@ -1642,7 +1710,7 @@ async def subsync_sync_data(request: Request):
 async def subsync_get_sub(name: str):
     """Get configs for a specific sub by name or username."""
     configs = []
-    host = get_host()
+    host = SETTINGS.get("domain") or get_host()
     
     # First check SUBS (subscription groups)
     async with SUBS_LOCK:
@@ -1724,52 +1792,7 @@ async def rotate_security_token(_=Depends(require_auth)):
     return {"ok": True, "security_token": SETTINGS["security_token"]}
 
 
-# ══════════════════════════════════════════════════════════════════════════════
-# REALITY SETTINGS
-# ══════════════════════════════════════════════════════════════════════════════
 
-@app.get("/api/tools/reality-settings")
-async def get_reality_settings(_=Depends(require_auth)):
-    """Return current Reality protocol settings."""
-    async with SETTINGS_LOCK:
-        return {
-            "reality_port": SETTINGS.get("reality_port", "443"),
-            "reality_dest": SETTINGS.get("reality_dest", "google.com:443"),
-            "reality_server_names": SETTINGS.get("reality_server_names", ["www.google.com", "google.com"]),
-            "reality_public_key": SETTINGS.get("reality_public_key", ""),
-            "reality_short_id": SETTINGS.get("reality_short_id", ""),
-        }
-
-
-@app.post("/api/tools/reality-settings")
-async def update_reality_settings(request: Request, _=Depends(require_auth)):
-    """Save Reality protocol settings."""
-    body = await request.json()
-    async with SETTINGS_LOCK:
-        if "reality_port" in body:
-            SETTINGS["reality_port"] = str(body["reality_port"]).strip() or "443"
-        if "reality_dest" in body:
-            SETTINGS["reality_dest"] = str(body["reality_dest"]).strip() or "google.com:443"
-        if "reality_server_names" in body:
-            names = body["reality_server_names"]
-            if isinstance(names, str):
-                names = [n.strip() for n in names.split("\n") if n.strip()]
-            SETTINGS["reality_server_names"] = list(names) if names else ["www.google.com"]
-        if "reality_public_key" in body:
-            SETTINGS["reality_public_key"] = str(body["reality_public_key"]).strip()
-        if "reality_short_id" in body:
-            SETTINGS["reality_short_id"] = str(body["reality_short_id"]).strip() or ""
-    asyncio.create_task(save_state())
-    log_activity("settings", "تنظیمات Reality به‌روزرسانی شد", "ok")
-    async with SETTINGS_LOCK:
-        return {
-            "ok": True,
-            "reality_port": SETTINGS.get("reality_port", "443"),
-            "reality_dest": SETTINGS.get("reality_dest", "google.com:443"),
-            "reality_server_names": SETTINGS.get("reality_server_names", ["www.google.com", "google.com"]),
-            "reality_public_key": SETTINGS.get("reality_public_key", ""),
-            "reality_short_id": SETTINGS.get("reality_short_id", ""),
-        }
 
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -1935,7 +1958,7 @@ async def group_subscription(group_id: str, _=Depends(require_auth)):
         raise HTTPException(status_code=404, detail="no active users in group")
 
     content = base64.b64encode("\n".join(configs).encode()).decode()
-    host = get_host()
+    host = SETTINGS.get("domain") or get_host()
     return {
         "group_id": group_id,
         "group_name": g.get("name"),

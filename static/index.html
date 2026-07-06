@@ -33,7 +33,7 @@
 [data-theme="light"]:not([data-accent]){--bg:#f5f5f9;--bg2:#fff;--bg3:#e8e8f0;--txt:#1a1a2e;--txt2:#666680;--neon:#d50000;--bg-opacity:0.04;--glow:0 0 20px rgba(255,23,68,.08)}
 [data-theme="light"][data-accent="green"]{--bg:#f0f4f0;--bg2:#fff;--bg3:#e0f0e0;--txt:#0a1a0a;--txt2:#558855;--neon:#0a0;--bg-opacity:0.04;--glow:0 0 24px rgba(0,170,0,.08)}
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--txt);overflow-x:hidden}@media(max-width:900px){body{font-size:14px}.btn{padding:8px 12px;font-size:11px}.btn-sm{padding:4px 8px;font-size:10px}td,th{padding:8px 6px;font-size:11px}}
+body{font-family:system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--txt);overflow-x:hidden}@media(max-width:900px){body{font-size:14px}input,select,button{font-size:16px!important}.btn{padding:10px 14px;font-size:12px}.btn-sm{padding:6px 10px;font-size:11px}td,th{padding:8px 4px;font-size:10px}.stat{padding:12px 8px}.stat-v{font-size:18px}.modal-c{max-width:95vw;padding:16px}.panel{padding:12px}.topbar{padding:10px 12px}.content{padding:10px}.stats{grid-template-columns:repeat(2,1fr);gap:8px}.main-area{margin-right:0}}@media(max-width:900px){body{font-size:14px}.btn{padding:8px 12px;font-size:11px}.btn-sm{padding:4px 8px;font-size:10px}td,th{padding:8px 6px;font-size:11px}}
 ::-webkit-scrollbar{width:4px}::-webkit-scrollbar-thumb{background:var(--neon);border-radius:4px}
 
 /* Login */
@@ -61,7 +61,7 @@ body{font-family:system-ui,-apple-system,sans-serif;background:var(--bg);color:v
 /* Layout */
 .app-wrap{display:none;min-height:100vh}
 .app-wrap.active{display:flex}
-.sidebar{width:240px;background:var(--bg2);border-right:1px solid var(--bg3);display:flex;flex-direction:column;position:fixed;top:0;bottom:0;right:0;z-index:100;transition:transform .3s,width .2s;overflow-y:auto}
+.sidebar{width:240px;background:var(--bg2);border-right:1px solid var(--bg3);display:flex;flex-direction:column;position:fixed;top:0;bottom:0;right:0;z-index:100;transition:transform .3s;overflow-y:auto}
 .sb-brand{padding:20px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--bg3)}
 .sb-brand img{width:36px;height:36px}
 .sb-brand-t{font-size:16px;font-weight:800;letter-spacing:2px}
@@ -76,7 +76,7 @@ body{font-family:system-ui,-apple-system,sans-serif;background:var(--bg);color:v
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
 
 .main-area{flex:1;margin-right:240px;display:flex;flex-direction:column}
-.topbar{padding:16px 24px;background:var(--bg2);border-bottom:1px solid var(--bg3);display:flex;align-items:center;justify-content:space-between}.sidebar-tog{display:none!important}@media(max-width:900px){.sidebar-tog{display:inline-flex!important}}
+.topbar{padding:16px 24px;background:var(--bg2);border-bottom:1px solid var(--bg3);display:flex;align-items:center;justify-content:space-between}.sidebar-tog{display:inline-flex!important}
 .topbar-greet{font-size:14px}.topbar-greet strong{color:var(--neon)}
 .topbar-r{display:flex;gap:8px;align-items:center}
 .content{padding:20px 24px;flex:1;overflow-y:auto}
@@ -240,13 +240,36 @@ tr:hover td{background:rgba(255,255,255,.02)}
 
       <!-- ═══ TOOLS ═══ -->
       <div id="tab-tools" class="tab-content hidden">
-        <div class="panel"><div class="panel-h"><span class="glow">⚙️ تنظیمات Reality</span></div>
+        <!-- Connection Mode -->
+        <div class="panel"><div class="panel-h"><span class="glow">🌐 تنظیمات اتصال</span></div>
+          <div class="set-row"><span class="set-lbl">حالت WebSocket</span><div style="display:flex;gap:8px"><button class="btn btn-sm" id="tws-on" onclick="toggleMode('websocket',true)" style="background:var(--green);color:#000">فعال</button><button class="btn btn-sm btn-g" id="tws-off" onclick="toggleMode('websocket',false)">غیرفعال</button></div></div>
+          <div class="set-row"><span class="set-lbl">حالت XHTTP</span><div style="display:flex;gap:8px"><button class="btn btn-sm" id="txh-on" onclick="toggleMode('xhttp',true)" style="background:var(--green);color:#000">فعال</button><button class="btn btn-sm btn-g" id="txh-off" onclick="toggleMode('xhttp',false)">غیرفعال</button></div></div>
+          <div class="set-row"><span class="set-lbl">پروتکل پیش‌فرض</span><select id="ts-defconn" onchange="saveDefaultConnection()" style="background:var(--bg3);border:1px solid var(--bg3);border-radius:var(--r);color:var(--txt);padding:6px 10px;font-family:inherit;font-size:13px"><option value="ws">WebSocket</option><option value="xhttp">XHTTP</option><option value="tcp">TCP</option></select></div>
+        </div>
+
+        <!-- Domain Management -->
+        <div class="panel"><div class="panel-h"><span class="glow">🌍 مدیریت دامنه</span></div>
+          <div class="f-r"><div class="f-g" style="flex:3">
+            <label>دامنه اصلی (برای WS/XHTTP)</label>
+            <div style="display:flex;gap:6px"><input type="text" id="rs-domain" placeholder="example.com" list="dm-list" style="flex:1"><datalist id="dm-list"></datalist></div>
+          </div><div class="f-g" style="flex:1"><label>پورت</label><input type="number" id="rs-ext-port" value="443"></div></div>
+          <div style="display:flex;gap:8px;margin-top:10px"><button class="btn btn-p" onclick="saveDomain()" style="flex:1"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> ذخیره دامنه</button><button class="btn btn-g btn-sm" onclick="clearDomainHistory()">🗑️ پاک کردن تاریخچه</button></div>
+          <div id="dm-history" style="margin-top:10px;display:flex;gap:6px;flex-wrap:wrap"></div>
+        </div>
+
+        <!-- Reality Settings -->
+        <div class="panel"><div class="panel-h"><span class="glow">🔐 تنظیمات Reality</span></div>
           <div class="f-r"><div class="f-g"><label>پورت داخلی (سرور)</label><input type="number" id="rs-port" value="1234"></div><div class="f-g"><label>آدرس مقصد (dest)</label><input type="text" id="rs-dest" value="google.com:443"></div></div>
-          <div class="f-r"><div class="f-g"><label>SNI پیش‌فرض</label><input type="text" id="rs-sni"></div><div class="f-g"><label>Public Key</label><input type="text" id="rs-pbk"></div></div>
+          <div class="f-r"><div class="f-g"><label>SNI پیش‌فرض</label><input type="text" id="rs-sni"></div><div class="f-g"><label>Public Key</label><div style="display:flex;gap:6px"><input type="text" id="rs-pbk" style="flex:1"><button class="btn btn-sm btn-b" onclick="generateRealityKeys()" title="تولید کلید">🔑</button></div></div></div>
           <div class="f-r"><div class="f-g"><label>Short ID</label><input type="text" id="rs-sid" value="6ba85179e30d4fc2"></div><div class="f-g"><label>SpiderX</label><input type="text" id="rs-spx" value="/"></div></div>
-          <div class="f-r"><div class="f-g"><label>External Domain (کاربر می‌بیند)</label><input type="text" id="rs-ext-domain" placeholder="hayabusa.proxy.rlwy.net"></div><div class="f-g"><label>External Port</label><input type="number" id="rs-ext-port" value="443"></div></div>
+          <div class="f-r"><div class="f-g"><label>External Domain (نمایش به کاربر)</label><input type="text" id="rs-ext-domain" placeholder="hayabusa.proxy.rlwy.net"></div></div>
+          <div style="margin-top:8px;font-size:11px;color:var(--txt2)">🔹 Internal (127.0.0.1:{پورت}) → External ({domain}:{پورت})</div>
           <button class="btn btn-p" onclick="saveRealitySettings()" style="width:100%;margin-top:12px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> ذخیره تنظیمات Reality</button>
-          <p style="font-size:11px;color:var(--txt2);margin-top:8px;text-align:center">🔹 Internal (127.0.0.1:{پورت}) → External ({domain}:{port})</p>
+        </div>
+
+        <!-- Subscriptions -->
+        <div class="panel"><div class="panel-h"><span class="glow">📦 اشتراک‌ها (Subs)</span><button class="btn btn-p btn-sm" onclick="openCreateSub()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> اشتراک جدید</button></div>
+          <div id="subs-c"><div class="empty">در حال بارگذاری...</div></div>
         </div>
       </div>
 
@@ -309,6 +332,16 @@ tr:hover td{background:rgba(255,255,255,.02)}
   <button class="btn btn-g" onclick="closeModal('mod-cfg')" style="width:100%;margin-top:8px">بستن</button>
 </div></div>
 
+<div class="modal" id="mod-sub"><div class="modal-c">
+  <div class="modal-t"><span class="glow">ایجاد اشتراک جدید</span></div>
+  <form onsubmit="submitCreateSub(event)">
+    <div class="f-g"><label>نام اشتراک</label><input type="text" id="cs-name" required></div>
+    <div class="f-g"><label>توضیحات</label><input type="text" id="cs-desc"></div>
+    <div class="f-g"><label>رمز (اختیاری - برای اشتراک خصوصی)</label><input type="password" id="cs-pw"></div>
+    <div class="modal-btns"><button type="button" class="btn btn-g" onclick="closeModal('mod-sub')">انصراف</button><button type="submit" class="btn btn-p" id="cs-submit">ایجاد اشتراک</button></div>
+  </form>
+</div></div>
+
 <div class="toast" id="toast"></div>
 
 <script>
@@ -351,7 +384,7 @@ async function showApp(){$id('login-wrap').style.display='none';$id('app-wrap').
 async function loadAll(){loadStats();loadUsers();loadSubs()}
 
 // ═══════ NAV ═══════
-function switchTab(tab,el){document.querySelectorAll('.nav-item').forEach(function(n){n.classList.remove('active')});if(el)el.classList.add('active');document.querySelectorAll('.tab-content').forEach(function(t){t.classList.add('hidden')});var t=$id('tab-'+tab);if(t)t.classList.remove('hidden')}
+function switchTab(tab,el){document.querySelectorAll('.nav-item').forEach(function(n){n.classList.remove('active')});if(el)el.classList.add('active');document.querySelectorAll('.tab-content').forEach(function(t){t.classList.add('hidden')});var t=$id('tab-'+tab);if(t){t.classList.remove('hidden');if(tab==='tools'){loadConnectionModes();loadRealitySettings();loadSubs()}}}
 
 // ═══════ STATS ═══════
 async function loadStats(){try{var d=await api('/stats');$id('s1').textContent=d.active_users||0;$id('s1b').textContent='کل: '+(d.total_users||0);$id('s2').textContent=d.total_users||0;$id('s2b').textContent='فعال: '+(d.active_users||0);$id('s3').textContent=(d.traffic_usage_gb||0).toFixed(2)+' GB';$id('s3b').textContent='اتصالات: '+(d.active_connections||0);$id('s4').textContent=d.uptime||'--';$id('s4b').textContent=d.server_status||'healthy'}catch(e){}}
@@ -398,8 +431,8 @@ async function loadSubs(){try{var d=await api('/api/subs');ALL_S=d.subs||[];rend
 function renderSubs(){var el=$id('subs-c');if(!ALL_S.length){el.innerHTML='<div class="empty">هیچ اشتراکی نیست</div>';return}
   el.innerHTML=ALL_S.map(function(s){var url=window.location.origin+'/sub-sync/sub/'+(s.name||s.id);return'<div class="sub-card"><div class="sub-card-h"><span class="sub-card-name">'+(s.name||'اشتراک')+'</span><span class="badge badge-g">'+(s.links_count||0)+' کانفیگ</span></div><input class="sub-link" readonly value="'+url+'" onclick="this.select()"><div class="sub-acts"><button class="btn btn-sm btn-g" onclick="copyText(\''+url+'\')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg> کپی</button><button class="btn btn-sm btn-b" onclick="window.open(\'/sub-sync/sub/'+(s.name||s.id)+'\',\'_blank\')">🔗 باز کردن</button><button class="btn btn-sm btn-r" onclick="delSub(\''+s.id+'\')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg></button></div></div>'}).join('')}
 function openCreateSub(){$id('mod-sub').classList.add('show')}
-async function submitCreateSub(e){e.preventDefault();var btn=$id('cs-submit');btn.disabled=true;btn.textContent='⏳';
-  try{await api('/api/subs',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:$id('cs-name').value,description:$id('cs-desc').value})});toast('اشتراک ایجاد شد','ok');closeModal('mod-sub');loadSubs()}catch(e){}btn.disabled=false;btn.textContent='ایجاد'}
+async function submitCreateSub(e){e.preventDefault();var btn=$id('cs-submit');btn.disabled=true;btn.textContent='⏳';var body={name:$id('cs-name').value,description:$id('cs-desc').value};var pw=$id('cs-pw').value.trim();if(pw)body.password=pw;
+  try{await api('/api/subs',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});toast('اشتراک ایجاد شد','ok');closeModal('mod-sub');loadSubs()}catch(e){}btn.disabled=false;btn.textContent='ایجاد'}
 async function delSub(id){if(!confirm('حذف؟'))return;try{await api('/api/subs/'+id,{method:'DELETE'});toast('حذف شد','ok');loadSubs()}catch(e){}}
 function copySubLink(uname){var url=window.location.origin+'/sub/'+uname;navigator.clipboard.writeText(url).then(function(){toast('\u0644\u06CC\u0646\u06A9 \u0633\u0627\u0628 \u06A9\u067E\u06CC \u0634\u062F','ok')}).catch(function(){})}
 function copyText(t){navigator.clipboard.writeText(t).then(function(){toast('کپی شد','ok')})}
@@ -422,11 +455,35 @@ function buildFromIPs(){if(!siIPs.length){toast('اول اسکن کن','err');re
   el.style.display='block';el.textContent=out;curCfg=out}
 
 // ═══════ REALITY ═══════
-async function loadRealitySettings(){try{var d=await api('/api/tools/reality-settings');$id('rs-port').value=d.port||1234;$id('rs-dest').value=d.dest||'google.com:443';$id('rs-sni').value=d.sni||'';$id('rs-pbk').value=d.public_key||'';$id('rs-sid').value=d.short_id||'6ba85179e30d4fc2';$id('rs-spx').value=d.spiderx||'/';$id('rs-ext-domain').value=d.external_domain||'';$id('rs-ext-port').value=d.external_port||443}catch(e){}}
-async function saveRealitySettings(){var body={port:parseInt($id('rs-port').value)||1234,dest:$id('rs-dest').value,sni:$id('rs-sni').value,public_key:$id('rs-pbk').value,short_id:$id('rs-sid').value,spiderx:$id('rs-spx').value,external_domain:$id('rs-ext-domain').value,external_port:parseInt($id('rs-ext-port').value)||443};
-  try{await api('/api/tools/reality-settings',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});toast('تنظیمات Reality ذخیره شد','ok')}catch(e){}}
+async function loadRealitySettings(){try{var d=await api('/api/tools/reality-settings');$id('rs-port').value=d.port||1234;$id('rs-dest').value=d.dest||'google.com:443';$id('rs-sni').value=d.sni||'';$id('rs-pbk').value=d.public_key||'';$id('rs-sid').value=d.short_id||'6ba85179e30d4fc2';$id('rs-spx').value=d.spiderx||'/';$id('rs-ext-domain').value=d.external_domain||'';$id('rs-ext-port').value=d.external_port||443;$id('rs-domain').value=d.domain||'';renderDomainHistory(d.domain_history||[])}catch(e){}}
+async function saveRealitySettings(){var body={port:parseInt($id('rs-port').value)||1234,dest:$id('rs-dest').value,sni:$id('rs-sni').value,public_key:$id('rs-pbk').value,short_id:$id('rs-sid').value,spiderx:$id('rs-spx').value,external_domain:$id('rs-ext-domain').value,external_port:parseInt($id('rs-ext-port').value)||443,domain:$id('rs-domain').value};
+  try{await api('/api/tools/reality-settings',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});toast('تنظیمات Reality ذخیره شد','ok');loadRealitySettings()}catch(e){}}
+
+// ═══════ DOMAIN MANAGEMENT ═══════
+var domainHistory=[];
+function renderDomainHistory(list){domainHistory=list||[];var dl=$id('dm-list');dl.innerHTML=domainHistory.map(function(d){return'<option value="'+esc(d)+'">'}).join('');var dh=$id('dm-history');
+  if(!domainHistory.length){dh.innerHTML='<span style="font-size:11px;color:var(--txt2)">هنوز دامنه‌ای ثبت نشده</span>';return}
+  dh.innerHTML=domainHistory.map(function(d){return'<button class="btn btn-sm btn-g" onclick="$id(\'rs-domain\').value=\''+esc(d)+'\'" style="font-size:11px">'+esc(d)+'</button>'}).join('')}
+async function saveDomain(){var d=$id('rs-domain').value.trim();if(!d){toast('دامنه را وارد کنید','err');return}
+  try{await api('/api/tools/settings',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({domain:d})});toast('دامنه ذخیره شد','ok');loadRealitySettings()}catch(e){}}
+async function clearDomainHistory(){if(!confirm('پاک کردن تاریخچه دامنه‌ها؟'))return;
+  try{await api('/api/tools/reality-settings',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({domain:'__CLEAR__'})});toast('تاریخچه پاک شد','ok');loadRealitySettings()}catch(e){}}
+
+// ═══════ CONNECTION MODES ═══════
+async function loadConnectionModes(){try{var d=await api('/api/tools/settings');
+  updateModeBtn('tws',d.websocket_mode);updateModeBtn('txh',d.xhttp_mode);$id('ts-defconn').value=d.default_connection_mode||'ws'}catch(e){}}
+function updateModeBtn(prefix,on){var elOn=$id(prefix+'-on'),elOff=$id(prefix+'-off');if(on){elOn.style.background='var(--green)';elOn.style.color='#000';elOff.style.background='';elOff.style.color=''}else{elOn.style.background='';elOn.style.color='';elOff.style.background='var(--red)';elOff.style.color='#fff'}}
+function toggleMode(mode,val){updateModeBtn(mode==='websocket'?'tws':'txh',val);
+  var body={};body[mode==='websocket'?'websocket_mode':'xhttp_mode']=val;
+  api('/api/tools/settings',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}).catch(function(){})}
+async function saveDefaultConnection(){var v=$id('ts-defconn').value;
+  try{await api('/api/tools/settings',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({default_connection_mode:v})});toast('پروتکل پیش‌فرض: '+v.toUpperCase(),'ok')}catch(e){}}
+
+// ═══════ KEY GENERATION ═══════
+async function generateRealityKeys(){try{var d=await api('/api/tools/generate-reality-keys',{method:'POST'});$id('rs-pbk').value=d.public_key;toast('کلید Public تولید شد',d.note?'warn':'ok');if(d.note)toast(d.note,'warn')}catch(e){toast('خطا در تولید کلید','err')}}
 
 // ═══════ SETTINGS ═══════
+async function generateKeys(){try{var d=await api('/api/tools/generate-reality-keys',{method:'POST'});$id('rs-pbk').value=d.public_key;var el=$id('key-result');el.style.display='block';el.innerHTML='<b>Private:</b> '+d.private_key+'<br><b>Public:</b> '+d.public_key;toast('Key Pair تولید شد (Public در فیلد PBK قرار گرفت)','ok')}catch(e){toast('خطا: cryptography نصب نیست','err')}}
 async function changePassword(){var o=$id('set-old').value,n=$id('set-new').value;if(!o||!n){toast('همه فیلدها پر شود','err');return}if(n.length<4){toast('رمز حداقل ۴ کاراکتر','err');return}
   try{await api('/api/change-password',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({current_password:o,new_password:n})});toast('رمز تغییر کرد','ok');$id('set-old').value='';$id('set-new').value=''}catch(e){}}
 
@@ -434,7 +491,7 @@ async function changePassword(){var o=$id('set-old').value,n=$id('set-new').valu
 function openSidebar(){$id("sidebar").classList.add("open");$id("sidebar-backdrop").classList.add("show")}
 function closeSidebar(){$id("sidebar").classList.remove("open");$id("sidebar-backdrop").classList.remove("show")}
 function toggleSidebar(){$id("sidebar").classList.contains("open")?closeSidebar():openSidebar()}
-(async function init(){var authed=await checkAuth();if(authed){showApp();return}$id('login-wrap').style.display='flex';$id('login-pw').addEventListener('keydown',function(e){if(e.key==='Enter')doLogin()});loadRealitySettings()})();
+(async function init(){var authed=await checkAuth();if(authed){showApp();return}$id('login-wrap').style.display='flex';$id('login-pw').addEventListener('keydown',function(e){if(e.key==='Enter')doLogin()})})();
 </script>
 </body>
 </html>
