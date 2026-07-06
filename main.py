@@ -230,8 +230,9 @@ def get_host() -> str:
     return os.environ.get("RAILWAY_PUBLIC_DOMAIN", CONFIG["host"])
 
 def generate_uuid() -> str:
-    h = secrets.token_hex(16)
-    return f"{h[:8]}-{h[8:12]}-{h[12:16]}-{h[16:20]}-{h[20:32]}"
+    """Generate a real UUID v4."""
+    import uuid as _uuid
+    return str(_uuid.uuid4())
     
 def now_ir() -> datetime:
     return datetime.now(IRAN_TZ)
@@ -416,8 +417,8 @@ def generate_user_config(user_id: str, user: dict) -> str:
             # VLESS + WS + TLS: Domain from Domain Management ONLY, port 443, no Reality
             ws_host = SETTINGS.get("domain") or host
             ws_sni = sni if sni and sni != host else ws_host
-            # Path: /ws/{config_uuid[:8]}
-            ws_path = quote(f"/ws/{config_uuid[:8]}", safe='')
+            # Path: /ws/{config_uuid}
+            ws_path = quote(f"/ws/{config_uuid}", safe='')
             params = (f"path={ws_path}&security=tls&alpn=http%2F1.1"
                       f"&encryption=none&insecure=0&host={ws_host}"
                       f"&fp=chrome&type=ws&allowInsecure=0&sni={ws_sni}")
@@ -1584,11 +1585,8 @@ async def generate_reality_keys(_=Depends(require_auth)):
         import base64 as b64
         return {"private_key": b64.b64encode(priv_bytes).decode(), "public_key": b64.b64encode(pub_bytes).decode()}
     except ImportError:
-        # Fallback: return placeholder (user needs cryptography package)
-        import secrets, base64 as b64
-        return {"private_key": b64.b64encode(secrets.token_bytes(32)).decode(), 
-                "public_key": b64.b64encode(secrets.token_bytes(32)).decode(),
-                "note": "Install cryptography for real keys: pip install cryptography"}
+        # cryptography not installed - return error
+        return {"error": True, "private_key": "", "public_key": "", "note": "cryptography not installed: pip install cryptography"}
 
 @app.get("/api/tools/reality-settings")
 async def get_reality_settings(_=Depends(require_auth)):
