@@ -382,39 +382,22 @@ def generate_user_config(user_id: str, user: dict) -> str:
     else:
         path_enc = quote(f"/ws/{config_uuid}", safe='')
 
-    # ── Reality Protocol ──
+    # ── Reality Protocol (PURE TCP ONLY) ──
     if protocol == "reality":
         rs = SETTINGS.get("reality", {})
         reality_pbk = rs.get("public_key", "")
         reality_sid = rs.get("short_id", "6ba85179e30d4fc2")
         reality_spx = rs.get("spiderx", "/")
-        # SNI: user SNI > settings SNI > default
         sni_reality = sni if sni and sni != host else rs.get("sni", "www.google.com")
         ext_domain = rs.get("external_domain", host)
         ext_port = rs.get("external_port", 443)
-        # Transport: default to xhttp for Reality (user preference honored)
-        rt = user.get("transport_type") or "xhttp"
-        # Validate pbk — warn if empty
-        if not reality_pbk:
-            remark = quote(f"Spider-{username}-NO_PBK")
-
-        if rt == "xhttp":
-            extra = quote('{"xPaddingBytes":"100-1000","mode":"auto","scMaxEachPostBytes":"1000000"}', safe='')
-            params = (f"encryption=none&security=reality&sni={quote(sni_reality)}&fp=chrome"
-                      f"&pbk={reality_pbk}&sid={reality_sid}&spx={quote(reality_spx, safe='')}"
-                      f"&type=xhttp&path={path_enc}&mode=auto&extra={extra}")
-        elif rt == "grpc":
-            params = (f"encryption=none&security=reality&sni={quote(sni_reality)}&fp=chrome"
-                      f"&pbk={reality_pbk}&sid={reality_sid}&spx={quote(reality_spx, safe='')}"
-                      f"&type=grpc&serviceName={path_enc}&mode=gun")
-        elif rt == "ws":
-            params = (f"encryption=none&security=reality&sni={quote(sni_reality)}&fp=chrome"
-                      f"&pbk={reality_pbk}&sid={reality_sid}&spx={quote(reality_spx, safe='')}"
-                      f"&type=ws&path={path_enc}")
-        else:  # tcp
-            params = (f"encryption=none&security=reality&type=tcp"
-                      f"&sni={quote(sni_reality)}&fp=chrome&alpn=h2,http/1.1"
-                      f"&pbk={reality_pbk}&sid={reality_sid}&spx={quote(reality_spx, safe='')}")
+        # Validate required Reality fields
+        if not reality_pbk or not reality_sid:
+            return f"vless://{config_uuid}@{ext_domain}:{ext_port}?encryption=none&security=reality&sni={quote(sni_reality)}&fp=chrome&pbk=MISSING_PBK&sid=MISSING_SID&type=tcp#{remark}"
+        # Reality = PURE TCP only. No ws/xhttp/grpc/path/host mixing.
+        params = (f"encryption=none&security=reality&type=tcp"
+                  f"&sni={quote(sni_reality)}&fp=chrome&alpn=h2,http/1.1"
+                  f"&pbk={reality_pbk}&sid={reality_sid}&spx={quote(reality_spx, safe='')}")
         return f"vless://{config_uuid}@{ext_domain}:{ext_port}?{params}#{remark}"
 
     # ── VLESS ──
